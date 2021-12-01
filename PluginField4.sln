@@ -3,7 +3,7 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
 VisualStudioVersion = 17.0.31612.314
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PluginField4", "PluginField4.csproj", "{ADDEEAEA-38FC-4C04-B366-F925B88D8714}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PRoConEvents", "src\PRoConEvents.csproj", "{ADDEEAEA-38FC-4C04-B366-F925B88D8714}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
