@@ -83,12 +83,48 @@ namespace PRoConEvents.Tests
 
         [TestMethod]
         public void GetAllEvents() {
-            var expectedEvents = new string[0];
+            var expectedEvents = new string[]
+            {
+                "OnGlobalChat",
+                "OnTeamChat",
+                "OnSquadChat",
+                "OnRoundOverPlayers",
+                "OnRoundOverTeamScores",
+                "OnRoundOver",
+                "OnLoadingLevel",
+                "OnLevelStarted",
+                "OnPlayerKilledByAdmin",
+                "OnPlayerKickedByAdmin",
+                "OnPlayerMovedByAdmin",
+                "OnPlayerJoin",
+                "OnPlayerLeft",
+                "OnPlayerAuthenticated",
+                "OnPlayerKilled",
+                "OnPlayerKicked",
+                "OnPlayerSpawned",
+                "OnPlayerTeamChange",
+                "OnPlayerSquadChange",
+                "OnBanAdded",
+                "OnBanRemoved",
+                "OnBanListLoad",
+                "OnBanList",
+                "OnRestartLevel",
+                "OnListPlayers",
+                "OnEndRound",
+                "OnRunNextLevel",
+                "OnCurrentLevel",
+                "OnYelling",
+                "OnSaying"
+            };
 
             var mock = new Mock<IAPI>();
             var pluginField4 = new PluginField4(mock.Object);
+            var allEvents = pluginField4.GetAllEvents();
 
-            Assert.AreEqual(expectedEvents, pluginField4.GetAllEvents());
+            Assert.AreEqual(expectedEvents.Length, allEvents.Length);
+
+            for (var i = 0; i < expectedEvents.Length; i++)
+                Assert.AreEqual(expectedEvents[i], allEvents[i]);
         }
 
         [TestMethod]
@@ -194,7 +230,7 @@ namespace PRoConEvents.Tests
             (var hashtableArray, var playerInfoList) = Helper.BuildPlayerInfoList();
 
             var expectedEventName = "OnRoundOverPlayers";
-            var eventData = hashtableArray[0];
+            var eventData = new Hashtable { { "players", hashtableArray } };
             var expectedJsonEventData = JSON.JsonEncode(Helper.BuildEventData(eventData));
 
             var mock = new Mock<IAPI>();
@@ -218,8 +254,7 @@ namespace PRoConEvents.Tests
             (var hashtableArray, var teamScoreList) = Helper.BuildTeamScoreList();
 
             var expectedEventName = "OnRoundOverTeamScores";
-            var eventData = hashtableArray[0];
-            var expectedJsonEventData = JSON.JsonEncode(Helper.BuildEventData(eventData));
+            var expectedJsonEventData = JSON.JsonEncode(Helper.BuildEventData(hashtableArray));
 
             var mock = new Mock<IAPI>();
 
@@ -651,7 +686,9 @@ namespace PRoConEvents.Tests
             (var hashtableArray, var banInfoList) = Helper.BuildBanInfoList();
 
             var expectedEventName = "OnBanList";
-            var eventData = hashtableArray[0];
+            var eventData = new Hashtable {
+                { "bans", hashtableArray }
+            };
             var expectedJsonEventData = JSON.JsonEncode(Helper.BuildEventData(eventData));
 
             var mock = new Mock<IAPI>();
@@ -695,11 +732,11 @@ namespace PRoConEvents.Tests
         [TestMethod]
         public void OnListPlayers() {
             (var hashtablePlayerInfoList, var playerInfoList) = Helper.BuildPlayerInfoList();
-            (var hashtableSubset, var playerSubset) = Helper.BuildPlayerSubset();
+            (var hashtableSubset, var playerSubset) = Helper.BuildPlayerSquadSubset();
 
             var expectedEventName = "OnListPlayers";
             var eventData = new Hashtable {
-                { "players", hashtablePlayerInfoList },
+                { "players", hashtablePlayerInfoList[0] },
                 { "subset", hashtableSubset }
             };
             var expectedJsonEventData = JSON.JsonEncode(Helper.BuildEventData(eventData));
@@ -788,7 +825,7 @@ namespace PRoConEvents.Tests
 
         [TestMethod]
         public void OnYelling() {
-            (var hashtable, var playerSubset) = Helper.BuildPlayerSubset();
+            (var hashtable, var playerSubset) = Helper.BuildPlayerSquadSubset();
 
             var expectedEventName = "OnYelling";
             var eventData = new Hashtable {
@@ -816,7 +853,7 @@ namespace PRoConEvents.Tests
 
         [TestMethod]
         public void OnSaying() {
-            (var hashtable, var playerSubset) = Helper.BuildPlayerSubset();
+            (var hashtable, var playerSubset) = Helper.BuildPlayerSquadSubset();
 
             var expectedEventName = "OnSaying";
             var eventData = new Hashtable {
