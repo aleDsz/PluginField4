@@ -11,7 +11,12 @@ using System.Threading.Tasks;
 
 namespace PRoConEvents.Tests {
     static internal class Helper {
-        public static Hashtable BuildEventData(Hashtable eventData) => new Hashtable { { "data", eventData } };
+        public static Hashtable BuildEventData(Hashtable eventData) {
+            var pluginField4 = new PluginField4();
+            var normalizedEventData = pluginField4.NormalizeHashtable(eventData);
+
+            return new Hashtable { { "data", normalizedEventData } };
+        }
 
         public static (Hashtable, CPlayerInfo) BuildPlayerInfo() {
             var pluginField4 = new PluginField4();
@@ -50,7 +55,7 @@ namespace PRoConEvents.Tests {
             return (hashtable, banInfo);
         }
 
-        public static (Hashtable, CPlayerSubset) BuildPlayerSubset() {
+        public static (Hashtable, CPlayerSubset) BuildPlayerSquadSubset() {
             var pluginField4 = new PluginField4();
             var playerSubset = new CPlayerSubset(CPlayerSubset.PlayerSubsetType.Player, 1, 1);
             var hashtable = pluginField4.PlayerSubsetToHashtable(playerSubset);
@@ -140,7 +145,7 @@ namespace PRoConEvents.Tests {
             return (hashtableList.ToArray(), banInfoList);
         }
 
-        public static (Hashtable[], List<TeamScore>) BuildTeamScoreList(int quantity = 1) {
+        public static (Hashtable, List<TeamScore>) BuildTeamScoreList(int quantity = 1) {
             var hashtableList = new List<Hashtable>();
             var teamScoreList = new List<TeamScore>();
 
@@ -156,7 +161,9 @@ namespace PRoConEvents.Tests {
                 });
             }
 
-            return (hashtableList.ToArray(), teamScoreList);
+            var hastable = new Hashtable { { "team_scores", hashtableList.ToArray() } };
+
+            return (hastable, teamScoreList);
         }
     }
 }
