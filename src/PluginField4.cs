@@ -1,5 +1,5 @@
-/*  Copyright 2021 aleDsz 
- 
+/*  Copyright 2021 aleDsz
+
     This plugin file is part of PRoCon Frostbite.
 
     This plugin is free software: you can redistribute it and/or modify
@@ -27,6 +27,8 @@ using PRoCon.Core.Plugin;
 using PRoCon.Core.Players;
 using PRoCon.Core.Players.Items;
 using System.Collections;
+using System.Linq;
+using System.Runtime.InteropServices;
 
 namespace PRoConEvents {
     public interface IAPI {
@@ -131,12 +133,17 @@ namespace PRoConEvents {
         /// </summary>
         /// <returns>The list of events to be registered</returns>
         public string[] GetAllEvents() {
-            List<string> events = new List<string>();
+            var events = new List<string>();
             var type = typeof(PluginField4);
+            var methodInfos = type.GetMethods();
 
-            foreach (MethodInfo methodInfo in type.GetMethods()) {
-                if (methodInfo.GetBaseDefinition().DeclaringType != methodInfo.DeclaringType) {
-                    events.Add(methodInfo.Name);
+            foreach (var methodInfo in methodInfos) {
+                var baseDefinition = methodInfo.GetBaseDefinition();
+
+                if (baseDefinition.DeclaringType != methodInfo.DeclaringType) {
+                    if (methodInfo.Name.StartsWith("On")) {
+                        events.Add(methodInfo.Name);
+                    }
                 }
             }
 
@@ -268,7 +275,7 @@ namespace PRoConEvents {
                 { "soldier_name", playerSubset.SoldierName },
                 { "team_id", playerSubset.TeamID },
                 { "squad_id", playerSubset.SquadID },
-                { "subset", playerSubset.Subset }
+                { "subset", playerSubset.Subset.ToString() }
             };
         }
 
@@ -326,23 +333,20 @@ namespace PRoConEvents {
         /// </summary>
         /// <param name="data">The hashtable to be normalized</param>
         /// <return>A normalized hashtable</return>
-        private Hashtable NormalizeHashtable(Hashtable data) {
-            var normalizedHashtable = new Hashtable();
+        public Hashtable NormalizeHashtable(Hashtable data) {
+            var normalizedHashtable = (Hashtable)data.Clone();
 
-            foreach (var key in data) {
+            foreach (var key in data.Keys) {
                 var value = data[key];
 
                 if (value is Hashtable[]) {
-                    string stringfiedArray = "[";
+                    var arrayList = new ArrayList();
 
                     foreach (var item in (Hashtable[])value) {
-                        var stringValue = JSON.JsonEncode(item);
-                        stringfiedArray += string.Format("{0},", stringValue);
+                        arrayList.Add(item);
                     }
 
-                    normalizedHashtable[key] = stringfiedArray;
-                } else {
-                    normalizedHashtable[key] = value;
+                    normalizedHashtable[key] = arrayList;
                 }
             }
 
@@ -400,7 +404,7 @@ namespace PRoConEvents {
         /// </summary>
         /// <param name="playerList"></param>
         public override void OnRoundOverPlayers(List<CPlayerInfo> playerList) {
-            List<Hashtable> players = new List<Hashtable>();
+            var players = new List<Hashtable>();
 
             foreach (var playerInfo in playerList) {
                 players.Add(PlayerInfoToHastable(playerInfo));
@@ -656,7 +660,7 @@ namespace PRoConEvents {
             }
 
             SendEvent("OnListPlayers", new Hashtable {
-                { "players", players },
+                { "players", players.ToArray() },
                 { "subset", PlayerSubsetToHashtable(playerSubset) }
             });
         }
